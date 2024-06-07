@@ -1,0 +1,15 @@
+<RaiseFault name='RF-Invalid-Request'>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+  <FaultResponse>
+    <Set>
+      <Payload contentType='application/json'>{
+  "error" : {
+    "code" : 400.01,
+    "message" : "You must pass three queryparams: {project, secretid, secretversion}."
+  }
+}
+</Payload>
+      <StatusCode>400</StatusCode>
+    </Set>
+  </FaultResponse>
+</RaiseFault>
