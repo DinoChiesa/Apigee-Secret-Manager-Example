@@ -106,7 +106,11 @@ this:
 apigee=https://35.207.223.215.nip.io
 ```
 
-The following retrieves version 1 of the secret with the hard-coded id of `apigee-example-secret`
+...replacing the `35.207.223.215` with the IP address of your Apigee instance,
+which you can find in the Google Cloud console under Apigee / Management /
+Instances .
+
+After you set that, the following will retrieve version 1 of the secret with the hard-coded id of `apigee-example-secret`
 ```
  curl -i $apigee/example-secret-accessor-proxy/t1
 ```
