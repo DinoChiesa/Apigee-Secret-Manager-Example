@@ -50,6 +50,7 @@ To run this sample, you need the following pre-requisites:
 - [gcloud CLI](https://cloud.google.com/sdk/docs/install)
 - [jq](https://jqlang.github.io/jq/)
 - [curl](https://curl.se/)
+- [openssl](https://www.openssl.org/)
 
 The [Google Cloud Shell](https://cloud.google.com/shell) has all of these. You
 can run this from there, if you like.
@@ -66,7 +67,8 @@ export PROJECT=my-apigee-org
 The setup script sets up the following:
  - a Service account for this example
  - An example API proxy that runs with the identity of that service account
- - A secret in Google Cloud secret manager, in the same project.
+ - A secret, a simple string, in Google Cloud secret manager, in the same project.
+ - A second secret, an RSA Private key, in Google Cloud secret manager, in the same project.
 
 
 This will take a few moments. When it completes, you will see this kind of output:
@@ -87,6 +89,11 @@ You should see the value that was inserted, shown above.
 or, to tell the proxy to retrieve your own secret:
   curl -i $apigee/example-secret-accessor-proxy/t2?secretid=my-secret\&secretversion=1
 
+or, to tell the proxy to retrieve an RSA Key from SecretManager, and sign a JWT with that key:
+   curl -i $apigee/example-secret-accessor-proxy/t3  -d ''
+
+You should see a signed JWT in a response header.
+
 ```
 
 After setting it up, you can demonstrate it.
@@ -99,16 +106,22 @@ this:
 apigee=https://35.207.223.215.nip.io
 ```
 
-Here is case #1.  This retrieves version 1 of the secret with the hard-coded id of `apigee-example-secret`
+The following retrieves version 1 of the secret with the hard-coded id of `apigee-example-secret`
 ```
- curl -i $apigee/example-proxy-1/t1
-```
-
-Or, you can try to retrieve an arbitrary version of any secret, this way:Conversely, this, case #3, is rejected:
-```
- curl -i $apigee/example-proxy-1/t2\?secretid=my-secret-id\&secretversion=2
+ curl -i $apigee/example-secret-accessor-proxy/t1
 ```
 
+Or, you can try to retrieve an arbitrary version of any secret, this way:
+```
+ curl -i $apigee/example-secret-accessor-proxy/t2?secretid=my-secret\&secretversion=2
+```
+
+Or, get a signed JWT:
+```
+ curl -i $apigee/example-secret-accessor-proxy/t3  -d ''
+```
+
+You should be able to decode that JWT with any tool. To verify it, you can use the public key PEM file that will be created in your directory. 
 
 To have a closer look at what's happening, you can turn on a debug session, to
 watch the execution of the proxy.
@@ -116,7 +129,7 @@ watch the execution of the proxy.
 
 ### Cleanup
 
-To remove the configuration from this example in your Apigee Organization, in your shell, run this command:
+To remove the configuration from this example in your Apigee Organization, run this command from your shell:
 
 ```bash
 ./clean-secret-manager-example.sh
