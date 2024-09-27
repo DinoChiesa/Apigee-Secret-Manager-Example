@@ -82,6 +82,26 @@
       <Condition>(proxy.pathsuffix MatchesPath "/t2") and (request.verb = "GET")</Condition>
     </Flow>
 
+    <Flow name="flow3">
+      <Request>
+        <Step>
+          <Name>SC-Retrieve-RSA-Key</Name>
+        </Step>
+        <Step>
+          <Name>AM-Decode-RSA-Key</Name>
+        </Step>
+      </Request>
+      <Response>
+        <Step>
+          <Name>GenerateJWT-Signed-with-RSA</Name>
+        </Step>
+        <Step>
+          <Name>AM-Response-JWT</Name>
+        </Step>
+      </Response>
+      <Condition>(proxy.pathsuffix MatchesPath "/t3") and (request.verb = "POST")</Condition>
+    </Flow>
+
     <Flow name="unknown request">
       <Request>
         <Step>

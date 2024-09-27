@@ -17,6 +17,7 @@
 EXAMPLE_NAME="secret-manager"
 PROXY_NAME="example-secret-accessor-proxy"
 SECRET_ID="apigee-example-secret"
+SECRET_ID_RSAKEY="apigee-example-rsakey-secret"
 PROXY_SA_BASE="example-secretaccessor-"
 
 # creating and deleting the SA repeatedly causes problems?
@@ -118,10 +119,10 @@ check_and_maybe_create_sa() {
         echo "$PROXY_SA" >./.proxy_sa_name
         gcloud iam service-accounts create "$PROXY_SA" --project="$PROJECT" --quiet
 
-        # There can be errors if all these changes happen too quickly
+        printf "There can be errors if all these changes happen too quickly, so we need to sleep a bit...\n"
         sleep 12
 
-        printf "Granting access for that service account to all secrets in the project.\n"
+        printf "Granting access for that service account to ALL SECRETS in the project.\n"
         gcloud projects add-iam-policy-binding "$PROJECT" \
             --member="serviceAccount:${FULL_SA_EMAIL}" \
             --role="${REQUIRED_ROLE}" \
@@ -129,11 +130,12 @@ check_and_maybe_create_sa() {
 
         printf "\n================================================\n"
         printf "  FYI, the above does not comply with PoLA. The service account SHOULD\n"
-        printf "  be granted access only to the secrets it needs.\n"
+        printf "  be granted access only to the specific secrets it needs.\n"
         printf "\n  eg,\n\n"
         printf "  gcloud secrets add-iam-policy-binding \"projects/myproject/secrets/mysecret\" %s\n" "\\"
         printf "    --member=\"serviceAccount:${FULL_SA_EMAIL}\" %s\n" "\\"
         printf "    --role=\"${REQUIRED_ROLE}\" \n"
+        printf "================================================\n\n"
     fi
 }
 
@@ -143,7 +145,7 @@ random_string() {
     echo ${rand_string}
 }
 
-create_secret() {
+create_random_secret() {
     local rstring=$(random_string)
     local TIMESTAMP=$(date '+%Y%m%d-%H%M%S')
     local secret_value="secret-${TIMESTAMP}-${rstring}"
@@ -151,6 +153,18 @@ create_secret() {
     printf "${secret_value}" | gcloud secrets create "$SECRET_ID" --project="$PROJECT" --data-file=- --quiet
 
     printf "\nThe secret value is:\n  %s\n" "${secret_value}"
+}
+
+create_rsakey_secret() {
+    printf "\nGenerating an RSA Key pair...\n"
+    local private_key=$(openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -outform PEM)
+    # printf "\n%s\n" "${private_key}"
+    printf "Creating secret %s\n" "$SECRET_ID_RSAKEY"
+    printf "%s" "${private_key}" | gcloud secrets create "$SECRET_ID_RSAKEY" --project="$PROJECT" --data-file=- --quiet
+    local TIMESTAMP=$(date '+%Y%m%d-%H%M%S')
+    local public_key_file="public-rsakey-$TIMESTAMP.pem"
+    printf "Emitting public key into  %s\n" "$public_key_file"
+    openssl pkey -pubout -inform PEM -outform PEM -in <(echo "$private_key") -out "$public_key_file"
 }
 
 MISSING_ENV_VARS=()
@@ -168,14 +182,16 @@ TOKEN=$(gcloud auth print-access-token)
 printf "Checking and possibly Creating Service Account...(%s)\n" "${PROXY_SA}"
 
 check_and_maybe_create_sa
-
 maybe_import_and_deploy_apiproxy
-
-create_secret
+create_random_secret
+create_rsakey_secret
 
 printf "\nAll the Apigee artifacts are successfully created.\n"
 printf "\nTo try:\n"
 printf "  curl -i \$apigee/${PROXY_NAME}/t1\n"
 printf "\nYou should see the value that was inserted, shown above.\n"
-printf "\nor, to tell the proxy to retrieve your own secret:\n "
+printf "\nor, to tell the proxy to retrieve a secret by an ID and version you specify:\n "
 printf "  curl -i \$apigee/${PROXY_NAME}/t2\?secretid=my-secret\&secretversion=1\n"
+printf "\nor, to tell the proxy to retrieve a secret and sign a JWT with that secret:\n "
+printf "  curl -i \$apigee/${PROXY_NAME}/t3  -d ''\n"
+printf "\nYou should see the value that was inserted, shown above.\n"

@@ -1,0 +1,34 @@
+<ServiceCallout name='SC-Retrieve-RSA-Key'>
+  <Request variable='request-for-secret'>
+    <Set>
+      <!-- Use the settings in the propertyset for the secretid and version. -->
+      <!-- This assumes the secret is managed in the same project as the API Proxy. -->
+      <Path>/v1/projects/{organization.name}/secrets/{propertyset.settings.secretid_rsakey}/versions/{propertyset.settings.secretversion_rsakey}:access</Path>
+      <Verb>GET</Verb>
+    </Set>
+  </Request>
+  <Response>secretResponse</Response>
+
+  <HTTPTargetConnection>
+
+    <Authentication>
+      <GoogleAccessToken>
+        <Scopes>
+          <Scope>https://www.googleapis.com/auth/cloud-platform</Scope>
+        </Scopes>
+      </GoogleAccessToken>
+    </Authentication>
+
+    <SSLInfo>
+      <Enabled>true</Enabled>
+      <Enforced>true</Enforced>
+    </SSLInfo>
+
+    <Properties>
+      <Property name='success.codes'>2xx</Property>
+    </Properties>
+
+    <URL>https://secretmanager.googleapis.com</URL>
+  </HTTPTargetConnection>
+
+</ServiceCallout>

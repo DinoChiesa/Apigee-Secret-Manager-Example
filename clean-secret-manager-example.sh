@@ -17,6 +17,7 @@
 EXAMPLE_NAME="secret-manager"
 PROXY_NAME="example-secret-accessor-proxy"
 SECRET_ID="apigee-example-secret"
+SECRET_ID_RSAKEY="apigee-example-rsakey-secret"
 PROXY_SA_BASE="example-secretaccessor-"
 #PROXY_SA_BASE="apigee-example-secret-accessor"
 
@@ -38,11 +39,12 @@ remove_access() {
 }
 
 delete_secret() {
-    if gcloud secrets describe "$SECRET_ID" --project="$PROJECT" --quiet >/dev/null 2>&1; then
-        printf "Deleting that secret (%s)...\n" "${SECRET_ID}"
-        gcloud secrets delete "$SECRET_ID" --project="$PROJECT" --quiet
+    local secretid="$1"
+    if gcloud secrets describe "$secretid" --project="$PROJECT" --quiet >/dev/null 2>&1; then
+        printf "Deleting secret (%s)...\n" "${secretid}"
+        gcloud secrets delete "$secretid" --project="$PROJECT" --quiet
     else
-        printf "That secret (%s) does not exist.\n" "${SECRET_ID}"
+        printf "The secret (%s) does not exist.\n" "${secretid}"
     fi
 }
 
@@ -113,7 +115,11 @@ delete_apiproxy "$PROXY_NAME"
 
 remove_access
 
-delete_secret
+delete_secret "$SECRET_ID"
+
+delete_secret "$SECRET_ID_RSAKEY"
+
+rm -f "public-rsakey-*.pem" 2>&1 >/dev/null
 
 remove_sa
 

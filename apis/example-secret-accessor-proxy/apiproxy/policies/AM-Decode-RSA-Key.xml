@@ -1,0 +1,21 @@
+<AssignMessage name='AM-Decode-RSA-Key'>
+  <AssignVariable>
+    <Name>json_path_1</Name>
+    <Value>$.payload.data</Value>
+  </AssignVariable>
+  <AssignVariable>
+    <Name>b64-encoded-secret</Name>
+    <Value>BADDBEEF</Value>
+    <Template>{jsonPath(json_path_1,secretResponse.content)}</Template>
+  </AssignVariable>
+  <AssignVariable>
+    <!-- using the private prefix for this variable prevents this from being displayed in trace -->
+    <Name>private.plaintext-rsakey</Name>
+    <Template>{decodeBase64(b64-encoded-secret)}</Template>
+  </AssignVariable>
+  <AssignVariable>
+    <!-- omitting the private prefix for this variable means it will be showed in Trace -->
+    <Name>plaintext-rsakey</Name>
+    <Template>{decodeBase64(b64-encoded-secret)}</Template>
+  </AssignVariable>
+</AssignMessage>

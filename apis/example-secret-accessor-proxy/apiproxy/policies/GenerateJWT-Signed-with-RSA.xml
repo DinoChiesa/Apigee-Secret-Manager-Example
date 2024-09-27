@@ -1,0 +1,12 @@
+<GenerateJWT name='GenerateJWT-Signed-with-RSA'>
+  <Algorithm>RS256</Algorithm>
+  <IgnoreUnresolvedVariables>false</IgnoreUnresolvedVariables>
+  <PrivateKey>
+    <Value ref="private.plaintext-rsakey"/>
+  </PrivateKey>
+  <Subject>urn://{organization.name}/{environment.name}/{apiproxy.name}</Subject>
+  <Issuer>issuer-goes-here</Issuer>
+  <Audience>audience-here</Audience>
+  <ExpiresIn>1h</ExpiresIn>
+  <OutputVariable>output-jwt</OutputVariable>
+</GenerateJWT>

@@ -1,0 +1,16 @@
+<AssignMessage name='AM-Response-JWT'>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+  <Set>
+    <Headers>
+      <Header name="JWT">{output-jwt}</Header>
+    </Headers>
+    <Payload contentType='application/json'>{
+  "status" : "ok",
+  "retrieved-secret" : "{escapeJSON(plaintext-rsakey)}"
+}
+</Payload>
+    <ReasonPhrase>OK</ReasonPhrase>
+    <StatusCode>200</StatusCode>
+  </Set>
+  <AssignTo>response</AssignTo>
+</AssignMessage>
