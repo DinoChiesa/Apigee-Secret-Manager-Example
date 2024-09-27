@@ -93,6 +93,9 @@
       </Request>
       <Response>
         <Step>
+          <Name>AM-JWT-Elements</Name>
+        </Step>
+        <Step>
           <Name>GenerateJWT-Signed-with-RSA</Name>
         </Step>
         <Step>

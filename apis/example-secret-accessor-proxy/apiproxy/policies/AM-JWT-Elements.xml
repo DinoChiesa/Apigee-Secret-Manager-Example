@@ -1,0 +1,11 @@
+<AssignMessage name='AM-JWT-Elements'>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+  <AssignVariable>
+    <Name>jwt-subject</Name>
+    <Template>urn://{organization.name}/{environment.name}/{apiproxy.name}</Template>
+  </AssignVariable>
+  <AssignVariable>
+    <Name>jwt-issuer</Name>
+    <Template>urn://{organization.name}/{environment.name}/{apiproxy.name}/{messageid}</Template>
+  </AssignVariable>
+</AssignMessage>
