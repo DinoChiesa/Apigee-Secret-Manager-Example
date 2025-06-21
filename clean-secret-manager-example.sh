@@ -27,7 +27,7 @@ remove_access() {
 
     printf "Checking access...\n"
     # shellcheck disable=SC2207
-    local members=($(gcloud projects get-iam-policy "$PROJECT" --filter="bindings.role:$role" --flatten="bindings[].members" --format='value[](bindings.members)' | grep "serviceAccount:" | grep "$SA_NAME_PREFIX"))
+    local members=($(gcloud projects get-iam-policy "$PROJECT" --filter="bindings.role:$role" --flatten="bindings[].members" --format='value[](bindings.members)' | grep "serviceAccount:" | grep "$PROXY_SA_BASE"))
 
     for member in "${members[@]}"; do
         printf "  Removing IAM binding for %s\n" "$member"

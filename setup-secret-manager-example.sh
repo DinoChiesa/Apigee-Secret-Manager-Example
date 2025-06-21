@@ -111,7 +111,7 @@ check_and_maybe_create_sa() {
         if ! [[ ${ARR[*]} =~ "${REQUIRED_ROLE}" ]]; then
             echo "Adding ${REQUIRED_ROLE}"
             gcloud projects add-iam-policy-binding "${PROJECT}" \
-                --member="serviceAccount:${SA_EMAIL}" \
+                --member="serviceAccount:${FULL_SA_EMAIL}" \
                 --role="$role" --quiet >>/dev/null 2>&1
         fi
 
